@@ -78,16 +78,18 @@ jobs:
         run: |
           set -euo pipefail
           DMG="ADB Pull Photos-${VERSION}.dmg"
-          EXTRA_ARGS=()
-          if [[ "${PRERELEASE}" == "true" ]]; then
-            EXTRA_ARGS+=(--prerelease)
-          fi
 
           if gh release view "$VERSION" >/dev/null 2>&1; then
             gh release upload "$VERSION" "$DMG" --clobber
           else
-            gh release create "$VERSION" "$DMG" \
-              --title "ADB Pull Photos ${VERSION}" \
-              --notes-file RELEASE_NOTES.md \
-              "${EXTRA_ARGS[@]}"
+            if [[ "${PRERELEASE}" == "true" ]]; then
+              gh release create "$VERSION" "$DMG" \
+                --title "ADB Pull Photos ${VERSION}" \
+                --notes-file RELEASE_NOTES.md \
+                --prerelease
+            else
+              gh release create "$VERSION" "$DMG" \
+                --title "ADB Pull Photos ${VERSION}" \
+                --notes-file RELEASE_NOTES.md
+            fi
           fi
